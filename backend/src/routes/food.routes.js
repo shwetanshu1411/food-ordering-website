@@ -30,18 +30,52 @@
 // router.post("/", authFoodPartnerMiddleware, upload.single("video"), createFood);
 
 // export default router;
+// routes/food.routes.js
+
 import express from "express";
 import multer from "multer";
-import { createFood, getFoodItems } from "../controllers/food.controller.js";
-import { authFoodPartnerMiddleware } from "../middleware/auth.middleware.js";
+
+import foodController from "../controllers/food.controller.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
-const upload = multer(); // in-memory storage
 
-// POST route — add new food item
-router.post("/", authFoodPartnerMiddleware, upload.single("video"), createFood);
+// Multer setup (memory storage)
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
-// GET route — fetch all food items
-router.get("/", authFoodPartnerMiddleware, getFoodItems);
+/* POST /api/food/ [protected] */
+router.post(
+  "/",
+  authMiddleware.authFoodPartnerMiddleware,
+  upload.single("mama"),
+  foodController.createFood
+);
+
+/* GET /api/food/ [protected] */
+router.get(
+  "/",
+  authMiddleware.authUserMiddleware,
+  foodController.getFoodItems
+);
+
+router.post(
+  "/like",
+  authMiddleware.authUserMiddleware,
+  foodController.likeFood
+);
+
+router.post(
+  "/save",
+  authMiddleware.authUserMiddleware,
+  foodController.saveFood
+);
+
+router.get(
+  "/save",
+  authMiddleware.authUserMiddleware,
+  foodController.getSaveFood
+);
 
 export default router;
