@@ -216,7 +216,8 @@ export async function registerfoodPartner(req, res) {
             _id: foodPartner._id,
             email: foodPartner.email,
             name: foodPartner.name
-        }
+        },
+        token,
     });
 }
 
@@ -240,7 +241,8 @@ export async function loginfoodPartner(req, res) {
             _id: foodPartner._id,
             email: foodPartner.email,
             name: foodPartner.name
-        }
+        },
+        token,
     });
 }
 

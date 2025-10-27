@@ -1,36 +1,92 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar"; // ✅ add this
 
-import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import UserLogin from "./pages/UserLogin";
+import UserRegister from "./pages/UserRegister";
 import FoodPartnerLogin from "./pages/FoodPartnerLogin";
 import FoodPartnerRegister from "./pages/FoodPartnerRegister";
-import FoodPartnerDashboard from "./pages/FoodPartnerDashboard";
-import Saved from "./pages/Saved";
+import FoodPartnerDashboardPage from "./pages/FoodPartnerDashboardPage";
+import OrderPage from "./pages/OrderPage";
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [foodPartner, setFoodPartner] = useState(null);
 
-  const logout = () => {
+  const handleLogout = () => {
     setUser(null);
     setFoodPartner(null);
   };
 
+  useEffect(() => {
+    // TODO: check session/cookies if needed
+  }, []);
+
   return (
-    <Router>
-      <Navbar user={user} foodPartner={foodPartner} logout={logout} />
+    <>
+      {/* ✅ Navbar visible on all pages */}
+      <Navbar user={user} foodPartner={foodPartner} logout={handleLogout} />
+
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
-        <Route path="/register" element={<Register setUser={setUser} />} />
-        <Route path="/foodpartner/login" element={<FoodPartnerLogin setFoodPartner={setFoodPartner} />} />
-        <Route path="/foodpartner/register" element={<FoodPartnerRegister setFoodPartner={setFoodPartner} />} />
-        <Route path="/dashboard" element={<FoodPartnerDashboard />} />
-        <Route path="/saved" element={<Saved />} />
+        {/* Home page – visible to everyone */}
+        <Route
+          path="/"
+          element={<Home user={user} foodPartner={foodPartner} />}
+        />
+
+        {/* User login/register */}
+        <Route
+          path="/user/login"
+          element={user ? <Navigate to="/" /> : <UserLogin setUser={setUser} />}
+        />
+        <Route
+          path="/user/register"
+          element={
+            user ? <Navigate to="/" /> : <UserRegister setUser={setUser} />
+          }
+        />
+
+        {/* Food Partner login/register */}
+        <Route
+          path="/foodpartner/login"
+          element={
+            foodPartner ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <FoodPartnerLogin setFoodPartner={setFoodPartner} />
+            )
+          }
+        />
+        <Route
+          path="/foodpartner/register"
+          element={
+            foodPartner ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <FoodPartnerRegister setFoodPartner={setFoodPartner} />
+            )
+          }
+        />
+
+        {/* Partner Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            foodPartner ? (
+              <FoodPartnerDashboardPage foodPartner={foodPartner} />
+            ) : (
+              <Navigate to="/foodpartner/login" />
+            )
+          }
+        />
+
+        {/* Orders – only users can order */}
+        <Route
+          path="/order/:foodId"
+          element={user ? <OrderPage user={user} /> : <Navigate to="/user/login" />}
+        />
       </Routes>
-    </Router>
+    </>
   );
 }

@@ -1,81 +1,49 @@
-// // const express=require("express");
-// // const router=express.Router();
-// // const foodController=require("../controllers/food.controller");
-// // // const authMiddleware=require("../middleware/auth.middleware");
-// // const { authFoodPartnerMiddleware } = require("../middleware/auth.middleware");
-// // const multer=require("multer");
-
-// // const upload=multer({
-// //     storage:multer.memoryStorage(),
-
-// // })
-
-// // /// api/food/     (protected route)
-// // router.post("/",authFoodPartnerMiddleware,upload.single("video"),foodController.createFood);
-// // module.exports=router;
-
-
-// import express from "express";
-// import { createFood } from "../controllers/food.controller.js";
-// import { authFoodPartnerMiddleware } from "../middleware/auth.middleware.js";
-// import multer from "multer";
-
-// const router = express.Router();
-
-// const upload = multer({
-//     storage: multer.memoryStorage(),
-// });
-
-// // /api/food/ (protected route)
-// router.post("/", authFoodPartnerMiddleware, upload.single("video"), createFood);
-
-// export default router;
-// routes/food.routes.js
-
 import express from "express";
+import * as foodController from "../controllers/food.controller.js";
+import * as authMiddleware from "../middlewares/auth.middleware.js";
 import multer from "multer";
-
-import foodController from "../controllers/food.controller.js";
-import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// Multer setup (memory storage)
-const upload = multer({
-  storage: multer.memoryStorage(),
-});
+// ✅ Multer setup for file upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-/* POST /api/food/ [protected] */
+/**
+ * POST /api/food
+ * Protected route - Only food partners can create food items
+ * Body: FormData { name, price, description, foodPartnerId, mama(file) }
+ */
 router.post(
   "/",
   authMiddleware.authFoodPartnerMiddleware,
-  upload.single("mama"),
+  upload.single("mama"), // ✅ matches frontend formData.append("mama", file)
   foodController.createFood
 );
 
-/* GET /api/food/ [protected] */
-router.get(
-  "/",
-  authMiddleware.authUserMiddleware,
-  foodController.getFoodItems
-);
+/**
+ * GET /api/food - Public
+ */
+router.get("/", foodController.getFoodItems);
 
-router.post(
-  "/like",
-  authMiddleware.authUserMiddleware,
-  foodController.likeFood
-);
+/**
+ * POST /api/food/like
+ */
+router.post("/like", authMiddleware.authUserMiddleware, foodController.likeFood);
 
-router.post(
-  "/save",
-  authMiddleware.authUserMiddleware,
-  foodController.saveFood
-);
+/**
+ * POST /api/food/save
+ */
+router.post("/save", authMiddleware.authUserMiddleware, foodController.saveFood);
 
-router.get(
-  "/save",
-  authMiddleware.authUserMiddleware,
-  foodController.getSaveFood
-);
+/**
+ * GET /api/food/save
+ */
+router.get("/save", authMiddleware.authUserMiddleware, foodController.getSaveFood);
+
+/**
+ * GET /api/food/partner/:partnerId
+ */
+router.get("/partner/:partnerId", foodController.getFoodsByPartner);
 
 export default router;
