@@ -23,9 +23,10 @@ export const loginFoodPartner = (data) => api.post("/auth/foodpartner/login", da
 export const logoutFoodPartner = () => api.get("/auth/foodpartner/logout");
 
 // Food endpoints
+export const uploadFood = (data) => api.post("/food", data);
 export const getFoodItems = () => api.get("/food");
 export const createFood = (formData) => api.post("/food", formData);
 
 export const getFoodPartnerById = (id) => api.get(`/food-partner/${id}`);
 export const getPartnerFoods = (partnerId) => api.get(`/food/partner/${partnerId}`);
-export const uploadFood = (data) => api.post("/food", data);
+

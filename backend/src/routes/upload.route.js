@@ -14,9 +14,19 @@ const imagekit = new ImageKit({
 });
 
 // Generate auth params for frontend
+// router.get("/auth", (req, res) => {
+//   const authParams = imagekit.getAuthenticationParameters();
+//   res.json(authParams);
+// });
+
 router.get("/auth", (req, res) => {
-  const authParams = imagekit.getAuthenticationParameters();
-  res.json(authParams);
+  try {
+    const result = imagekit.getAuthenticationParameters();
+    res.json(result);
+  } catch (error) {
+    console.error("ImageKit Auth Error:", error);
+    res.status(500).json({ message: "ImageKit auth failed" });
+  }
 });
 
 export default router;

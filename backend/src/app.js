@@ -30,5 +30,7 @@ app.use("/api/food", foodRoutes);
 app.use("/api/food-partner", foodPartnerRoutes);
 app.use("/api/upload", uploadRoutes);
 
+// app.use("/uploads", express.static("uploads"));
+
 
 export default app;

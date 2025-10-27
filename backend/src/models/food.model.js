@@ -27,7 +27,7 @@ const foodSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: { type: String, default: "" },
     price: { type: String, required: true },
-    imageUrl: { type: String, required: false }, // ✅ image instead of video
+    imageUrl: { type: String, default: "" }, // ✅ image instead of video
     foodPartner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "FoodPartner",

@@ -1,49 +1,57 @@
+
+
+
+
 import express from "express";
-import * as foodController from "../controllers/food.controller.js";
-import * as authMiddleware from "../middlewares/auth.middleware.js";
 import multer from "multer";
+import {
+  createFood,
+  getFoodItems,
+  getFoodsByPartner,
+  likeFood,
+  saveFood,
+  getSaveFood,
+    deleteFood,
+} from "../controllers/food.controller.js";
+
+import {
+  authFoodPartnerMiddleware,
+  authUserMiddleware,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-// ✅ Multer setup for file upload
+// ✅ Multer configuration (in-memory for now)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-/**
- * POST /api/food
- * Protected route - Only food partners can create food items
- * Body: FormData { name, price, description, foodPartnerId, mama(file) }
- */
-router.post(
-  "/",
-  authMiddleware.authFoodPartnerMiddleware,
-  upload.single("mama"), // ✅ matches frontend formData.append("mama", file)
-  foodController.createFood
-);
+// ✅ Create new food (only for food partners)
+// router.post(
+//   "/",
+//   authFoodPartnerMiddleware,
+//   upload.single("image"),
+//   createFood
+// );
 
-/**
- * GET /api/food - Public
- */
-router.get("/", foodController.getFoodItems);
+router.post("/create", 
+authFoodPartnerMiddleware,
+    upload.single("video"), createFood);
 
-/**
- * POST /api/food/like
- */
-router.post("/like", authMiddleware.authUserMiddleware, foodController.likeFood);
+// ✅ Get all food items (public)
+router.get("/", getFoodItems);
 
-/**
- * POST /api/food/save
- */
-router.post("/save", authMiddleware.authUserMiddleware, foodController.saveFood);
+// ✅ Get foods by specific partner
+router.get("/partner/:partnerId", getFoodsByPartner);
 
-/**
- * GET /api/food/save
- */
-router.get("/save", authMiddleware.authUserMiddleware, foodController.getSaveFood);
+// ✅ Like a food (only for logged-in users)
+router.post("/like", authUserMiddleware, likeFood);
 
-/**
- * GET /api/food/partner/:partnerId
- */
-router.get("/partner/:partnerId", foodController.getFoodsByPartner);
+// ✅ Save / Unsave a food (only for logged-in users)
+router.post("/save", authUserMiddleware, saveFood);
+
+// ✅ Get all saved foods (only for logged-in users)
+router.get("/save", authUserMiddleware, getSaveFood);
+
+router.delete("/:id", deleteFood); 
 
 export default router;

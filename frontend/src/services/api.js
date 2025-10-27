@@ -27,29 +27,37 @@ export const getPartnerFoods = (partnerId) =>
   api.get(`/food/partner/${partnerId}`);
 
 // Upload food (partner) using FormData
-export const createFood = (data) => {
+export const createFood = async (data) => {
+  // If using ImageKit URL, send JSON
+  if (data.imageUrl) {
+    return api.post("/food/create", {
+      name: data.name,
+      price: data.price,
+      description: data.description || "",
+      imageUrl: data.imageUrl,
+      foodPartnerId: data.foodPartnerId,
+    });
+  }
+
+  // If uploading directly via file
   const formData = new FormData();
   formData.append("name", data.name);
   formData.append("description", data.description || "");
   formData.append("price", data.price);
   formData.append("foodPartnerId", data.foodPartnerId);
-
-  // ✅ If user uploads a file
   if (data.file) {
-    formData.append("mama", data.file); // must match multer.single("mama")
-  }
-
-  // ✅ If using a URL instead of a file (for testing)
-  if (data.video) {
-    formData.append("video", data.video);
+    formData.append("image", data.file);
   }
 
   return api.post("/food", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+    headers: { "Content-Type": "multipart/form-data" },
   });
 };
+
+export const deleteFood = (id) => api.delete(`/food/${id}`);
+
+
+
 
 // ------------------- FOOD PARTNER DETAILS -------------------
 export const getFoodPartnerById = (id) => api.get(`/foodpartner/${id}`);
